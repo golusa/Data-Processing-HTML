@@ -1,0 +1,507 @@
+*{
+  margin: 0;
+  padding: 0;
+}
+
+html{
+  font-family: "宋体";
+}
+
+body{
+  background-color: rgb(232,232,232);
+  font-size: 7pt;
+  height: 100%;
+}
+
+.page{
+  transform-origin: 0 0;
+  transform: scale(1.4);
+  width: 209.9mm;
+  height: 297mm;
+  padding: 5.6mm 7.0mm 9.8mm 7.0mm;
+  box-shadow: 0 0 6mm rgb(199,199,199);
+  background-color: white;
+  position: relative;
+  left: 10%;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+table{
+  border-spacing:0;
+}
+
+table td{
+  padding: 0 0.5mm;
+}
+
+.page .head table{
+  border-spacing:0;
+  margin-bottom: 7pt;
+}
+
+.page .head table tr{
+  height: 2.5mm;
+}
+
+.page .head table tr:first-child{
+  height: 5.8mm;
+}
+.page .head table tr:first-child td:last-child{
+  text-align: right;
+  vertical-align: top;
+}
+
+.page .head table tr:nth-child(10){
+  height: 3.8mm;
+}
+
+.page .head table tr td:first-child{
+  width: 27.6mm;
+}
+
+.page .head table tr td:nth-child(2){
+  width: 73.7mm;
+}
+
+.page .head table tr td:nth-child(3){
+  width: 28.0mm;
+}
+
+.page .head table tr td:nth-child(4){
+  width: 69.6mm;
+}
+
+
+.main .top table {
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+  z-index: 1;
+}
+
+.main .top table td{
+  border-left: 1px solid;
+  border-top: 1px solid;
+  z-index: 1;
+}
+
+.main .top table tr{
+  height: 2.6mm;
+}
+
+.main .top table tr:nth-child(1){
+  height: 5.0mm;
+}
+
+.main .top table tr:nth-child(1) td{
+  text-align: center;
+}
+
+.main .top table tr:nth-child(3) td{
+  text-align: center;
+}
+.main .top table tr:nth-child(4) td{
+  text-align: center;
+}
+.main .top table tr:nth-child(2){
+  height: 5.0mm;
+}
+
+.main .top table tr:nth-child(3){
+  height: 6.3mm;
+}
+
+.main .top table tr:nth-child(4){
+  height: 4.2mm;
+}
+
+.main .top table tr td:nth-child(1){
+  width: 45.7mm;
+  text-align: center;
+}
+
+.main .top table tr td{
+  width: 20.3mm;
+  text-align: right;
+}
+
+.main .top p{
+  width: 46.7mm;
+  height: 3px;
+}
+
+.main .middle {
+  text-indent: 2em;
+  margin-top: 1mm;
+}
+
+.main .middle span:last-of-type{
+  padding: 0 0.5mm;
+}
+.main .middle input{
+  width: 14mm;
+  font-size: 7pt;
+}
+
+.main .bottom table {
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+}
+
+.main .bottom table td{
+  border-left: 1px solid;
+  border-top: 1px solid;
+  
+}
+
+.main .bottom table tr{
+  height: 2.9mm;
+}
+
+.main .bottom table tr:first-child{
+  height: 4.0mm;
+  text-align: center;
+}
+
+.main .bottom table tr td{
+  width: 16.8mm;
+  text-align: right;
+}
+
+.main .bottom table tr td:first-child{
+  width: 16.8mm;
+  text-align: center;
+}
+
+.main .bottom table tr td:first-child{
+  width: 45.7mm;
+}
+
+.footer{
+  position: absolute;
+  width: 793px;
+  height: 634px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex: 0;
+  bottom: 2%;
+}
+#canvas{
+  z-index: 0;
+  position: absolute;
+  height: 95%;
+  bottom: 5%;
+}
+
+#canvas1{
+  position: absolute;
+  z-index: 1;
+  height: 95%;
+  bottom: 5%;
+}
+
+.footer .col{
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-self: flex-end;
+  height: 80%;
+  padding-bottom: 5%;
+}
+
+.footer .col .img{
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-self: flex-end;
+  height: 100%;
+}
+
+.footer .col .img div{
+  width: 5px;
+  height: 100%;
+  border: 1px solid;
+}
+
+.footer .col .txt{
+  padding-left: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: space-between;
+  align-self: flex-end;
+}
+
+
+.footer .col .txt span{
+  color: red;
+}
+
+.col2{
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.col2 .timeset{
+  display: flex;
+  width: 100%;
+}
+
+.timex{
+  position: absolute;
+  bottom: 1%;
+}
+.timeset span{
+  display: inline-block;
+  margin-left: 65px;
+}
+
+.timeset span:first-child{
+  margin-left: 80px;
+}
+
+.col2 .timetxt{
+  text-align: center;
+  padding-left: 15%;
+}
+
+.container{
+  display: none;
+  float: left;
+  margin-left: 13px;
+  position: relative;
+  left: 20%;
+}
+/* bootstrap */
+
+.side{
+  width: 200px;
+  height: 100%;
+  background: rgb(7, 7, 7);
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  display: flex;
+}
+
+*{
+  margin: 0;
+  padding: 0;
+}
+
+html{
+  height: 100%;
+}
+body{
+  height: 100%;
+  display: flex;
+}
+.sidel{
+  min-width: 260px;
+  height: 100%;
+  background-color: #fff;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  font-size: 18px;
+}
+
+.project{
+  width: 100%;
+  overflow-y: scroll;
+}
+
+#listMenu{
+  position: relative;
+}
+#listMenu a:first-child>div{
+  width: 175px;
+  height: 175px;
+  position: absolute;
+  right: -176px;
+  top: 0;
+  background-color: #fff;
+  /* opacity: 0.7; */
+  display: none;
+  cursor: default;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+}
+
+#listMenu a:first-child>div div{
+  margin: 10px 20px;
+}
+
+#listMenu a:nth-child(2)>div{
+  width: 400px;
+  height: 175px;
+  position: absolute;
+  right: -401px;
+  top: 0;
+  background-color: #fff;
+  /* opacity: 0.7; */
+  display: none;
+  cursor: default;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+
+}
+
+#listMenu a:nth-child(2)>div button{
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+}
+
+#listMenu a:nth-child(3)>div{
+  width: 400px;
+  height: 175px;
+  position: absolute;
+  right: -401px;
+  top: 0;
+  background-color: #fff;
+  /* opacity: 0.7; */
+  display: none;
+  cursor: default;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+
+}
+
+#listMenu a:nth-child(3)>div button{
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+}
+
+#listMenu a:nth-child(4)>div{
+  width: 400px;
+  height: 175px;
+  position: absolute;
+  right: -401px;
+  top: 0;
+  background-color: #fff;
+  /* opacity: 0.7; */
+  display: none;
+  cursor: default;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+
+}
+
+#listMenu a:nth-child(4)>div button{
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+}
+
+#listMenu a:nth-child(5)>div{
+  width: 400px;
+  height: 175px;
+  position: absolute;
+  right: -401px;
+  top: 0;
+  background-color: #fff;
+  /* opacity: 0.7; */
+  display: none;
+  cursor: default;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+
+}
+
+#listMenu a:nth-child(5)>div button{
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+}
+
+#listMenu a:nth-child(5)>div .input-group{
+  width: 98%;
+  float: left;
+}
+
+#listMenu a:nth-child(6)>div{
+  width: 400px;
+  height: 175px;
+  position: absolute;
+  right: -401px;
+  top: 0;
+  background-color: #fff;
+  /* opacity: 0.7; */
+  display: none;
+  cursor: default;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+
+}
+
+#listMenu a:nth-child(6)>div button{
+  position: absolute;
+  bottom: 5px;
+}
+
+.endp{
+  font-family: 'Open Sans', sans-serif;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 14px;
+  position: absolute;
+  bottom: 2px;
+  left: 44px;
+  color: #333;
+  user-select: none;
+  opacity: 0.5;
+}
+
+.endp2{
+  font-family: 'Open Sans', sans-serif;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 14px;
+  position: absolute;
+  bottom: 16px;
+  left: 44px;
+  color: #333;
+  user-select: none;
+  opacity: 0.5;
+}
+
+
+
+#simulate{
+  position: absolute;
+  left: 5px;
+}
+
+#simu{
+  width: 700px;
+  height: 670px;
+  position: relative;
+}
+
+#comfirm{
+  position: absolute;
+  right: 5px;
+}
+
+#create{
+  position: absolute;
+  left: 22%;
+}
+
+#code{
+  display: none;
+  font-size: 18px;
+  color: rgb(84, 95, 107);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 20px 0;
+}

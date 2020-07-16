@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="jquery-1.11.3.js"></script>
+  <script src="bootstrap.js"></script>
+  <link rel="stylesheet" href="bootstrap.css">
+  <link rel="stylesheet" href="word.css">
+  <script>
+    $(function(){
+      var text = '';
+      var arr = [];
+      var oX = 0;
+      var color = ['rgb(255,0,0)','rgb(0,129,0)','rgb(0,0,255)','rgb(142,45,231)','rgb(165,45,45)','rgb(255,165,0)','rgb(157,206,52)','rgb(173,219,235)','rgb(243,133,243)','rgb(129,129,129)','black'];
+      var c = 0;
+      let btnSwitch = [{id:'btn1',num:0},{id:'btn2',num:0},{id:'btn3',num:0}];
+      let mode = 1;
+      let curY = [];
+      var canvas = document.getElementById('canvas');
+        
+      var ctx = canvas.getContext('2d');
+      $('.btn-switch').click(function(){
+          btnSwitch.forEach(value =>{
+            if(this.id == value.id){
+              if(!value.num){
+                $(this).parent().children('.mt-2').eq(0).children().hide();
+                $(this).parent().children('.mt-2').eq(0).children().val('');
+                $(this).parent().children('.mt-1').eq(0).children().show();
+                $(this).parent().children('.mt-1').eq(1).children().show();
+                $(this).html('曲线整体设置');
+                value.num = 1;
+              }else{
+                $(this).parent().children('.mt-2').eq(0).children().show();
+                $(this).parent().children('.mt-1').eq(0).children().hide();
+                $(this).parent().children('.mt-1').eq(0).children().val('');
+                $(this).parent().children('.mt-1').eq(1).children().hide();
+                $(this).parent().children('.mt-1').eq(1).children().val('');
+                $(this).html('曲线单独设置');
+                value.num = 0;
+              }
+            }
+          })
+      })
+
+      $('.aaaa').on('click','.form-check-input,.form-check-label',function(){
+        if($(this).parent().children('input').attr('id') == 'inlineRadio1'){
+          for(let i = 0; i < 3; i++){
+            for(let j = 1; j < 11 ; j++){
+              $('.input-group').eq(i).children('input').eq(j).attr('placeholder',`CH0` + j);
+                if(j == 10){
+                $('.input-group').eq(i).children('input').eq(j).attr('placeholder','CH10');
+                }
+            }
+          }
+
+          mode = 1;
+        }else if($(this).parent().children('input').attr('id') == 'inlineRadio2'){
+          for(let i = 0; i < 3; i++){
+            for(let j = 1; j < 11 ; j++){
+              $('.input-group').eq(i).children('input').eq(j).attr('placeholder',`CH1` + j);
+                if(j == 10){
+                $('.input-group').eq(i).children('input').eq(j).attr('placeholder','CH20');
+                }
+            }
+          }
+          mode = 11;
+          
+        }else if($(this).parent().children('input').attr('id') == 'inlineRadio3'){
+          for(let i = 0; i < 3; i++){
+            for(let j = 1; j < 11 ; j++){
+                $('.input-group').eq(i).children('input').eq(j).attr('placeholder',`CH2` + j);
+                if(j == 10){
+                $('.input-group').eq(i).children('input').eq(j).attr('placeholder','CH30');
+                }
+            }
+          }
+        mode = 21;
+
+        }
+        
+      })
+
+      $('input:text').on('keydown',function(e){
+        let key = e.which;
+        if(key == 13){
+          e.preventDefault;
+          let nxtInx = $(this).index() + 1;
+          $(this).next().focus();
+        }
+      })
+
+      $('#file').change(function(){
+                readfile(this.files[0]);
+                // $(".container").show();
+                $(this).parent().hide();
+                $('#listMenu').css('padding-top',96);
+                $('.page').css('display','flex');
+            })
+
+
+      $('#pri').click(function(){
+        $('.sidel').hide();
+        $('.page').css('left',0);
+        $('.project').removeClass('project');
+        window.print();
+      })
+      function readfile(f) {
+          var reader = new FileReader();
+          reader.readAsText(f);
+          reader.onload = function () {
+              text = reader.result;
+              dataOpeate(text);
+          }
+          reader.onerror = function(e) {
+              console.log('Error', e);
+          };
+      }
+
+      $('#op').click(function () {
+        dataOpeate(text);
+      })
+
+
+      
+      
+      $('#create').click(function(){
+        const cur1 = parseFloat($('#p12').val());
+        const cur2 = parseFloat($('#p121').val());
+        // const curY = $('#p122').val().split(' ');
+        // const curV = $('#p123').val().split(' ');
+        const mult = 122 / 50 ;
+
+        const cp1x = curY[0] * 1 + 10;
+        const cp1y = curY[1] * mult + 20;
+        const cp2x = curY[2] * 1 + 10;
+        const cp2y = curY[3] * mult + 20;
+
+        
+        ctx.beginPath();
+        ctx.moveTo(10,cur1 * mult + 20);
+        ctx.arc(10,cur1 * mult + 20,2, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(10,cur1 * mult + 20);
+        ctx.strokeStyle = color[oX];
+        console.log(cp1x , cp1y, cp2x, cp2y);
+        ctx.bezierCurveTo(cp1x , cp1y, cp2x, cp2y, 590, cur2 * mult +20);
+        // ctx.moveTo(560, (cur1 + dif) * mult +20);
+        // ctx.lineTo(590, (cur1 + dif) * mult +20);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.strokeStyle = 'black';
+        ctx.arc(590,cur2 * mult +20,2, 0, Math.PI * 2);
+        ctx.stroke();
+
+        let arr = [];
+        for(let i = 1; i < 581; i++){
+          arr.push(threeBezier( i / 580, [10, cur1 * mult + 20], [cp1x, cp1y], [cp2x, cp2y], [580, cur2 * mult + 20]))
+        }
+
+
+        let min = arr.reduce((pre,cur) => parseFloat(pre) < parseFloat(cur) ? parseFloat(pre) : parseFloat(cur))
+
+        let max = arr.reduce((pre,cur) =>  parseFloat(pre) > parseFloat(cur) ? parseFloat(pre) : parseFloat(cur))
+
+        let sum = 0;
+        for(let j = 0; j < arr.length ; j++){
+          sum += parseFloat(arr[j]) ;
+        }
+        let mean = (sum / arr.length).toFixed(1);
+        for(let j = 0; j < arr.length ; j++){
+          sum += Math.pow(parseFloat(arr[j]),2);
+        }
+        let RMS = Math.sqrt(sum / arr.length).toFixed(1);
+        dif = (max - min).toFixed(1);
+        min = parseFloat(min).toFixed(1);
+        max = parseFloat(max).toFixed(1);
+
+        
+
+        let node = $(`<tr>
+                    <td style='position:relative' >CH00${oX + 1} <p></p></td>
+                    <td>${cur1.toFixed(1)}</td>
+                    <td>${(cur2).toFixed(1)}</td>
+                    <td>${(cur2 -cur1).toFixed(1)}</td>
+                  </tr>`).appendTo('.top table');
+                  node.find('p').css('cssText',`width:46.7mm;height:3px;left:0;position:absolute;background-color:${color[oX]} !important`);
+                let col = $(`<div></div>`).appendTo('.footer .col .img');
+                  col.css({
+                    backgroundColor:color[oX]
+                  })
+
+        const rand = Math.random() * 0.1 + 0.9;
+        node = $(`<tr>
+        <td style='position:relative' >CH00${oX + 1} <p></p></td>
+          <td>${min}</td>
+          <td>${max}</td>
+          <td>${dif}</td>
+          <td>${mean}</td>
+          <td>${RMS}</td>
+        </tr>`).appendTo('.bottom table');
+          node.find('p').css({
+          width:'46.7mm',
+          height: 3,
+          left:0,
+          position:'absolute',
+          backgroundColor:color[oX],
+        });
+       oX++;
+      })
+
+      function dataOpeate(text) {
+
+        $('.page').html(`
+    <div class="head">
+      <table >
+        <tr>
+          <td>File Message</td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>File Name</td>
+          <td></td>
+          <td>Data Count</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Device Type</td>
+          <td>: MV2000</td>
+          <td>Sampling Interval</td>
+          <td>: 1.000 秒</td>
+        </tr>
+        <tr>
+          <td>Serial No.</td>
+          <td>: S5L911693</td>
+          <td>Start Time</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Time Correction</td>
+          <td>: None</td>
+          <td>Stop Time</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Starting Condition</td>
+          <td>: Manual</td>
+          <td>Trigger Time</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Dividing Condition</td>
+          <td>: Manual</td>
+          <td>Trigger No.</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Meas Ch.</td>
+          <td></td>
+          <td>Damage Check</td>
+          <td>: Not Damaged</td>
+        </tr>
+        <tr>
+          <td>Math Ch.</td>
+          <td>: 0</td>
+          <td>Started by</td>
+          <td>: [ Key In ]</td>
+        </tr>
+        <tr>
+          <td>Ext Ch.</td>
+          <td>: 0</td>
+          <td>Stopped by</td>
+          <td>: [ Key In ]</td>
+        </tr>
+        <tr>
+          <td>Printed Group</td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Printed Range</td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Comment</td>
+          <td>: </td>
+          <td></td>
+          <td></td>
+        </tr>
+      </table>
+    </div>
+    <div class="main">
+      <div class="top">
+        <table>
+          <tr>
+            <td></td>
+            <td>光标 A</td>
+            <td>光标 B</td>
+            <td>差</td>
+          </tr>
+          <tr>
+            <td>数据号码</td>
+            <td>0</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>绝对时间</td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>选择通道</td>
+            <td>值 A</td>
+            <td>值 B</td>
+            <td>值B-值A</td>
+          </tr>
+          
+        </table>
+      </div>
+      <div class="middle">
+        <span>运算区间</span>
+        <input type="text" value="0">
+        <span>-</span>
+        <input type="text">
+      </div>
+      <div class="bottom">
+        <table>
+          <tr>
+            <td>选择通道</td>
+            <td>MIN</td>
+            <td>MAX</td>
+            <td>P-P</td>
+            <td>Mean</td>
+            <td>RMS</td>
+          </tr> 
+        </table>
+      </div>
+    </div>
+    <div class="footer">
+      <div class="col">
+        <div class="img"></div>
+        <div class="txt">
+          <span>0</span>
+          <span>50</span>
+          <span>100</span>
+          <span>150</span>
+          <span>200</span>
+        </div>
+      </div>
+      <div class="col2">
+        <canvas id="canvas" width="650" height="600" ></canvas>
+          <canvas id="canvas1" width="650" height="600"></canvas>
+          <div class="timex">
+            <div class="timeset">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="timetxt">绝对时间 [h:m:s]</div>
+          </div>
+      </div>
+    </div>
+  `);
+        canvas1 = document.getElementById("canvas1");
+        ctx1 = canvas1.getContext("2d");
+        code = document.getElementById("code");
+        canvas = document.getElementById('canvas');
+        
+         ctx = canvas.getContext('2d');
+        
+
+        ctx.translate(0, 600);
+        ctx.rotate(Math.PI);
+        ctx.scale(-1,1);
+        ctx.stroke();
+        bgline(ctx); 
+
+        var arr = text.split('\n');
+              var arr2 = arr.map(value => value.split(','));
+              for(var i = 0; i < arr2.length; i++){
+                  for(var j = 0; j < arr2[i].length; j++){
+                      arr2[i][j] = arr2[i][j].replace(/\s/g,'');
+                      arr2[i][j] = arr2[i][j].replace(/"/g,' ');
+                  }
+              }
+
+              var num = arr2[27].length - 3;
+              var data = [];
+              var p2 = 1;
+
+              var arrStart = [0,0,0,0,0,0,0,0,0,0];
+              
+              var arrStartI = [1,2,3,4,5,6,7,8,9,10];
+              arrStartI = arrStartI.map(value => value + mode - 1);
+              var arrGlow = [0,0,0,0,0,0,0,0,0,0];
+              var arrTime = [1,1,1,1,1,1,1,1,1,1];
+              //温升变化，整体
+              if(btnSwitch[0].num == 0 && $('#btn1').parent().find('input').eq(0).val()){
+                arrStart = [];
+                arrStartI = [];
+                for(let i = 1; i < 11; i++){
+                  arrStartI.push(i + mode - 1);
+                  arrStart.push(parseFloat($('#btn1').parent().find('input').eq(0).val()));
+                }
+              }
+              //温升变化，个体
+              if(btnSwitch[0].num == 1){
+                arrStartI = [];
+                arrStart = [];
+                for(let i = 1; i < 11; i++){
+                  if($('#btn1').parent().find('input').eq(i).val()){
+                    arrStartI.push(i + mode - 1);
+                    arrStart.push($('#btn1').parent().find('input').eq(i).val());
+                  }else{
+                    arrStart.push(0);
+                  }
+                }
+                num = arrStart.length + mode - 1;
+                arrStart = arrStart.map(value => value = parseFloat(value));
+              }
+
+              //温升chushi变化，整体
+              if(btnSwitch[1].num == 0 && $('#btn2').parent().find('input').eq(0).val()){
+                arrGlow = [];
+                for(let i = 0; i < num; i++){
+                  arrGlow.push(parseFloat($('#btn2').parent().find('input').eq(0).val()));
+                }
+              }
+              //温升初始变化，个体
+              if(btnSwitch[1].num == 1){
+                arrGlow = [];
+                arrGlowI = [];
+                for(let i = 1; i < 11; i++){
+                  if($('#btn2').parent().find('input').eq(i).val()){
+                    arrGlowI.push(i);
+                    arrGlow.push($('#btn2').parent().find('input').eq(i).val());
+                  }else{
+                    arrGlow.push(0);
+                  }
+                }
+                arrGlow = arrGlow.map(value => value = parseFloat(value));
+              }
+
+              //时间变化，整体
+              if(btnSwitch[2].num == 0 && $('#btn3').parent().find('input').eq(0).val()){
+                arrTime = [];
+                for(let i = 0; i < num; i++){
+                  arrTime.push(parseFloat($('#btn3').parent().find('input').eq(0).val()));
+                }
+              }
+              //时间变化，个体
+              if(btnSwitch[2].num == 1){
+                arrTime = [];
+                arrTimeI = []
+                for(let i = 1; i < 11; i++){
+                  if($('#btn3').parent().find('input').eq(i).val()){
+                    arrTimeI = [];
+                    arrTime.push($('#btn3').parent().find('input').eq(i).val());
+                  }else{
+                    arrTime.push(1);
+                  }
+                }
+                arrTime = arrTime.map(value => value = parseFloat(value));
+                
+              }
+
+              if($('#p4').val()){
+                arr2.length = $('#p4').val();
+              }
+
+              if($('#p3').val()){
+                var strP3 = $('#p3').val();
+                var arrP3 = strP3.split(' ');
+                arr2[14][1] = arrP3[0];
+                arr2[14][2] = arrP3[1];
+                arr2[15][1] = arrP3[0];
+                arr2[16][1] = arrP3[0];
+              }
+
+              if($('#p4').val()){
+                var p4 = $('#p4').val();
+                arr2[12][1] = p4;
+                arr2[15][2] = setTime3(arr2[14][2],p4);
+                arr2[16][2] = setTime3(arr2[14][2],p4);
+                arr2[17][1] = p4;
+              }
+
+              let ok = 0;
+              
+              for(let i = mode; i <= num ; i++){
+                arrStartI.forEach(value =>{
+                  if(i == value){
+                    data.push([]);
+                    let glow = 0;
+                    let l = 1;
+                    switch (mode) {
+                      case 1:
+                        l = i - 1;
+                        break;
+                      case 11:
+                        l = i - 11;
+                        break;
+                      case 21:
+                        l = i - 21;
+                        break;
+                      default:
+                        break;
+                    }
+                    let ax = arr2[27][i + 2];
+                    for(let j = 27; j < arr2.length; j++){
+                      if(j < arr2.length * arrTime[l]){
+                        arr2[j][i + 2] = parseFloat(arrGlow[l] ? arrGlow[l] - ax : arrGlow[l]) + parseFloat(arr2[j][i + 2]);
+                        arr2[j][i + 2] = glow + parseFloat(arr2[j][i + 2]);
+                        glow += arrStart[l] / (arr2.length * arrTime[l]);
+                      }else{
+                        arr2[j][i + 2] = parseFloat(arrGlow[l] ? arrGlow[l] - ax : arrGlow[l]) + parseFloat(arr2[j][i + 2]);
+                        arr2[j][i + 2] = glow + parseFloat(arr2[j][i + 2]);
+                      }
+                      
+                      data[ok].push(arr2[j][i + 2]);
+                    }
+                    if(i == 1){
+                        console.log(data[ok],arrGlow[l], arr2[27][i + 2]);
+                      }
+                    draw0(data[ok],color[ok],ctx);
+                    ok++;
+                  }
+                })
+                
+              }
+              
+              
+              switch (mode) {
+                case 1:
+                  var cxz = 1;
+                  break;
+                case 11:
+                  var cxz = 2;
+                  break;
+                case 21:
+                  var cxz = 3;
+                  break;
+                default:
+                  break;
+              }
+              
+              //数据
+              $('.head table tr').eq(0).find('td').eq(1).html(':' + arr2[5][1]);
+              
+              $('.head table tr').eq(0).find('td').eq(1).html(':' + arr2[5][1]);
+              $('.head table tr').eq(1).find('td').eq(1).html(randomFile(arr2[14][1],arr2[14][2].trim(),arr2[5][1]).trim());
+              $('.head table tr').eq(1).find('td').eq(3).html(': ' + arr2[12][1]);
+              $('.head table tr').eq(3).find('td').eq(3).html(': ' + arr2[14][1] + ' ' + arr2[14][2].trim() + '.000');
+              $('.head table tr').eq(4).find('td').eq(3).html(': ' + arr2[15][1] + ' ' + arr2[15][2].trim() + '.000');
+              $('.head table tr').eq(5).find('td').eq(3).html(': ' + arr2[16][1] + ' ' + arr2[16][2].trim() + '.000');
+              $('.head table tr').eq(6).find('td').eq(3).html(': ' + arr2[17][1]);
+              $('.head table tr').eq(7).find('td').eq(1).html(': ' + arr2[9][1]);
+              $('.head table tr').eq(10).find('td').eq(1).html(': GROUP ' + cxz);
+              $('.head table tr').eq(11).find('td').eq(1).html(': ' + arr2[14][1] +  ' ' + arr2[14][2].trim()+ '.000' + ' - ' +arr2[15][1] + ' '+arr2[15][2].trim()+ '.000');
+
+              $('.main .top table tr').eq(1).find('td').eq(2).html(arr2[17][1]);
+              $('.main .top table tr').eq(1).find('td').eq(3).html(arr2[17][1]);
+
+              $('.main .top table tr').eq(2).find('td').eq(1).html(arr2[14][1] + ' '+ arr2[14][2].trim()+ '.000');
+
+              $('.main .top table tr').eq(2).find('td').eq(2).html(arr2[15][1] + " " +arr2[15][2].trim() +'.000');
+
+              $('.main .top table tr').eq(2).find('td').eq(3).html(setTime(arr2[12][1]));
+
+              $('.middle input').eq(1).val(arr2[12][1]);
+
+              $('.timeset span').eq(0).html(setTime3(arr2[14][2],arr2[12][1] / 6));
+              $('.timeset span').eq(1).html(setTime3(arr2[14][2],arr2[12][1] * 2 / 6));
+              $('.timeset span').eq(2).html(setTime3(arr2[14][2],arr2[12][1] * 3 / 6 ));
+              $('.timeset span').eq(3).html(setTime3(arr2[14][2],arr2[12][1] * 4 / 6));
+              $('.timeset span').eq(4).html(setTime3(arr2[14][2],arr2[12][1] * 5 / 6));
+
+
+              for(let i = 0; i < data.length; i++){
+                let start = parseFloat(data[i][0]);
+                let end = parseFloat(data[i][data[i].length-2]);
+                let dif = (end - start).toFixed(1);
+                let node = $(`<tr>
+                    <td style='position:relative' >CH00${i+mode} <p></p></td>
+                    <td>${start.toFixed(1)}</td>
+                    <td>${end.toFixed(1)}</td>
+                    <td>${dif}</td>
+                  </tr>`).appendTo('.top table');
+                  node.find('p').css('cssText',`width:46.7mm;height:3px;left:0;position:absolute;background-color:${color[i]} !important`);
+                let col = $(`<div></div>`).appendTo('.footer .col .img');
+                  col.css({
+                    backgroundColor:color[i]
+                  })
+                oX = data.length;
+                let min = data[i].reduce((pre,cur) =>{
+                  if(parseFloat(pre)  > parseFloat(cur) ){
+                    pre = cur;
+                  }
+                  return pre;
+                })
+                let max = data[i].reduce((pre,cur) =>{
+                  if(parseFloat(pre)  < parseFloat(cur)){
+                    pre = cur;
+                  }
+                  return pre;
+                })
+                let sum = 0;
+                for(let j = 0; j < data[i].length - 1; j++){
+                  sum += parseFloat(data[i][j]) ;
+                }
+                let mean = (sum / data[i].length).toFixed(1);
+                for(let j = 0; j < data[i].length - 1; j++){
+                  sum += Math.pow(parseFloat(data[i][j]),2);
+                }
+                let RMS = Math.sqrt(sum / data[i].length).toFixed(1);
+                dif = (max - min).toFixed(1);
+                min = parseFloat(min);
+                max = parseFloat(max);
+                node = $(`<tr>
+                  <td style='position:relative' >CH00${i+mode} <p></p></td>
+                    <td>${min.toFixed(1)}</td>
+                    <td>${max.toFixed(1)}</td>
+                    <td>${dif}</td>
+                    <td>${mean}</td>
+                    <td>${RMS}</td>
+                  </tr>`).appendTo('.bottom table');
+                    node.find('p').css({
+                    width:'46.7mm',
+                    height: 3,
+                    left:0,
+                    position:'absolute',
+                    backgroundColor:color[i],
+                  });
+              }
+      }
+
+      function bgline(ctx){
+                ctx.beginPath();
+                ctx.moveTo(0,20);
+                ctx.strokeStyle = '#ff0f0f';
+                ctx.lineTo(4,20);
+                ctx.lineTo(4,142);
+                ctx.lineTo(0,142);
+                ctx.moveTo(4,142);
+                ctx.lineTo(4,264);
+                ctx.lineTo(0,264);
+                ctx.moveTo(4,264);
+                ctx.lineTo(4,386);
+                ctx.lineTo(0,386);
+                ctx.lineTo(4,386);
+                ctx.lineTo(4,508);
+                ctx.lineTo(0,508);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(10,14);
+                ctx.strokeStyle = '#20e5e5';
+                ctx.lineTo(10,514);
+                ctx.moveTo(590,514);
+                ctx.lineTo(590,14);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(9,14);
+                ctx.strokeStyle = '#0d0d0d';
+                ctx.lineTo(10,514);
+                ctx.lineTo(590,514);
+                ctx.moveTo(9,14);
+                ctx.lineTo(590,14);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.strokeStyle = '#404040';
+                ctx.moveTo(10,10);
+                ctx.lineTo(590,10);
+                ctx.beginPath();
+                ctx.moveTo(10,142);
+                ctx.setLineDash([6, 4]);
+                ctx.lineTo(590,142);
+                ctx.moveTo(10,264);
+                ctx.lineTo(590,264);
+                ctx.moveTo(10,386);
+                ctx.lineTo(590,386);
+                ctx.moveTo(10,508);
+                ctx.lineTo(590,508);
+                ctx.moveTo(10,20);
+                ctx.lineTo(590,20);
+                ctx.moveTo(100,14);
+                ctx.lineTo(100,514);
+                ctx.moveTo(200,14);
+                ctx.lineTo(200,514);
+                ctx.moveTo(300,14);
+                ctx.lineTo(300,514);
+                ctx.moveTo(400,14);
+                ctx.lineTo(400,514);
+                ctx.moveTo(500,14);
+                ctx.lineTo(500,514);
+                ctx.stroke();
+            }
+
+      function draw0(arr,color,ctx) {
+          var time =[];
+          var point = Math.floor(arr.length / 580);
+          var count = 1;
+          const mult = 122 / 50 ;
+          for(i = 0; i < 580; i++){
+              time.push(i);
+          }
+          
+          ctx.beginPath();
+          ctx.moveTo(10, arr[0] * mult + 20);
+          ctx.setLineDash([4, 0]);
+          ctx.arc(10, arr[0] * mult + 20, 2, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(10, arr[0] * mult + 20);
+          ctx.strokeStyle = color;
+          for(var i = 0; i < time.length; i++){
+              ctx.lineTo(i + 10,arr[i * point] * mult + 20);
+          }
+          
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.strokeStyle = 'black';
+          ctx.moveTo(time.length + 09,arr[(time.length - 1) * point] * mult + 20);
+          ctx.arc(time.length + 09,arr[(time.length - 1) * point] * mult + 20,2, 0, Math.PI * 2);
+          ctx.stroke();
+
+      }
+
+      function setTime(sec){
+          sec = Math.floor(sec);
+          let hours = Math.floor(sec / 3600);
+          let mins = Math.floor((sec - hours * 3600) / 60); 
+          let secs = sec - hours * 3600 - mins * 60;
+          return `${hours}:${mins}:${secs}.000`;
+      }
+
+      function setTime3(start,sec){
+
+          let arrT = start.split(':');
+          let oSec = parseFloat(arrT[0]) * 3600 + parseFloat(arrT[1]) * 60 + parseFloat(arrT[2]);
+          
+          sec = Math.floor(parseFloat(sec) + oSec);
+          let hours = Math.floor(sec / 3600);
+          let mins = Math.floor((sec - hours * 3600) / 60); 
+          if(mins < 10){
+            mins = '0' + mins;
+          }
+          return `${hours}:${mins}:00`;
+      }
+
+      function setTime2(sec){
+          sec = Math.floor(sec);
+          sec = sec - sec % 60;
+          let hours = Math.floor(sec / 3600);
+          let mins = Math.floor((sec - hours * 3600) / 60); 
+          return `${hours}:${mins}`;
+      }
+
+      function randomFile(date,time,msg){
+        let randomNum = Math.floor(Math.random() * 200 + 800);
+        let arrdate = date.split('/');
+        arrdate[0] = arrdate[0].replace(20,'');
+        let arrtime = time.split(':');
+        arrdate = arrdate.map(value => value = value.trim());
+        arrdate = arrtime.map(value => value = value.trim());
+        msg = msg.trim();
+        
+        
+        return `: 000${randomNum}_${msg}${arrdate[0]}${arrdate[1]}${arrdate[2]}_${arrtime[0]}${arrtime[1]}${arrtime[2]}.DAE`;
+      }
+
+
+      function threeBezier(t, p1, cp1, cp2, p2) {
+        const [x1, y1] = p1;
+        const [x2, y2] = p2;
+        const [cx1, cy1] = cp1;
+        const [cx2, cy2] = cp2;
+        let x =
+            x1 * (1 - t) * (1 - t) * (1 - t) +
+            3 * cx1 * t * (1 - t) * (1 - t) +
+            3 * cx2 * t * t * (1 - t) +
+            x2 * t * t * t;
+        let y =
+            y1 * (1 - t) * (1 - t) * (1 - t) +
+            3 * cy1 * t * (1 - t) * (1 - t) +
+            3 * cy2 * t * t * (1 - t) +
+            y2 * t * t * t;
+        return ((y - 20) / (122 / 50)).toFixed(1)
+      }
+
+      $('#listMenu').on('mouseenter','a',function(){
+        $(this).children('div').show();
+      })
+      $('#listMenu').on('mouseleave','a',function(){
+        $(this).children('div').hide();
+      })
+      
+      $('#simulate').click(function(){
+        $('#canvas1').show();
+        $('#code').show();
+        Init(canvas.className == "quadratic");
+        $('#mmmm').hide();
+      })
+
+      $('#comfirm').click(function(){
+        var eee = new MouseEvent('click');
+        var ccc = document.getElementById('create');
+        ccc.dispatchEvent(eee);
+        $('#canvas1').hide();
+        $('#code').hide();
+      })
+      var mult = 122 / 50 ;
+
+      var canvas1, ctx1, code, point, style, drag = null, dPoint, img, data;
+      
+      var url = null;
+
+      // function downloadCanvasIamge(id, name){
+      //   var canvas = document.getElementById(id);
+      //   url = canvas.toDataURL('image/png');
+      //   var a = document.createElement('a');
+      //   var event = new MouseEvent('click');
+      //   a.download = name;
+      //   a.href = url;
+      //   // a.dispatchEvent(event);
+      // }
+
+      
+  // define initial points
+  function Init(quadratic) {
+    var y1 = 0,y2 = 0;
+  if($('#p12').val() && $('#p121').val()){
+    y1 = Number((580 - $('#p12').val() * mult).toFixed(1));
+    y2 = Number((580 - $('#p121').val() * mult).toFixed(1));
+
+  }
+
+
+  point = {
+  p1: { x:10, y:y1 || 500 },
+  p2: { x:590, y:y2 || 500 }
+};
+
+
+
+
+if (quadratic) {
+  point.cp1 = { x: 250, y: 100 };
+}
+else {
+  point.cp1 = { x: 200, y: 350 };
+  point.cp2 = { x: 400, y: 350 };
+}
+
+// default styles
+style = {
+  curve:	{ width: 2, color: "#333" },
+  cpline:	{ width: 1, color: "#C00" },
+  point: { radius: 6, width: 2, color: "#900", fill: "rgba(200,200,200,0.5)", arc1: 0, arc2: 2 * Math.PI }
+}
+
+// line style defaults
+ctx1.lineCap = "round";
+ctx1.lineJoin = "round";
+
+// event handlers
+canvas1.onmousedown = DragStart;
+canvas1.onmousemove = Dragging;
+canvas1.onmouseup = canvas.onmouseout = DragEnd;
+
+DrawCanvas();
+}
+// var Purl,coc = 0;
+// draw canvas
+function DrawCanvas() {
+
+// if(coc === 0){
+//   Purl = window.parent.canvas.toDataURL('image/png');
+//   img = new Image();
+//   if(Purl){
+//     img.src= Purl
+//   }else{
+//     img.src="bg.png"
+//   }
+//   img.onload = function(){
+//   ctx1.drawImage(img,300,300);
+// }
+// }
+ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
+console.log(point);
+// control lines
+ctx1.lineWidth = style.cpline.width;
+ctx1.strokeStyle = style.cpline.color;
+ctx1.beginPath();
+ctx1.moveTo(point.p1.x, point.p1.y);
+ctx1.lineTo(point.cp1.x, point.cp1.y);
+if (point.cp2) {
+  ctx1.moveTo(point.p2.x, point.p2.y);
+  ctx1.lineTo(point.cp2.x, point.cp2.y);
+}
+else {
+  ctx1.lineTo(point.p2.x, point.p2.y);
+}
+ctx1.stroke();
+
+// curve
+ctx1.lineWidth = style.curve.width;
+ctx1.strokeStyle = style.curve.color;
+ctx1.beginPath();
+ctx1.moveTo(point.p1.x, point.p1.y);
+if (point.cp2) {
+  ctx1.bezierCurveTo(point.cp1.x, point.cp1.y, point.cp2.x, point.cp2.y, point.p2.x, point.p2.y);
+}
+else {
+  ctx1.quadraticCurveTo(point.cp1.x, point.cp1.y, point.p2.x, point.p2.y);
+}
+ctx1.stroke();
+
+// control points
+for (var p in point) {
+  ctx1.lineWidth = style.point.width;
+  ctx1.strokeStyle = style.point.color;
+  ctx1.fillStyle = style.point.fill;
+  ctx1.beginPath();
+  ctx1.arc(point[p].x, point[p].y, style.point.radius, style.point.arc1, style.point.arc2, true);
+  ctx1.fill();
+  ctx1.stroke();
+}
+
+ShowCode();
+}
+
+
+// show canvas code
+function ShowCode() {
+let arr = [];
+for(let i = 1; i < 581; i++){
+  arr.push(threeBezier2( i / 580, [point.p1.x, point.p1.y], [point.cp1.x, point.cp1.y], [point.cp2.x, point.cp2.y], [point.p2.x, point.p2.y]))
+}
+
+let min = arr.reduce((pre,cur) => parseFloat(pre) < parseFloat(cur) ? parseFloat(pre) : parseFloat(cur))
+
+let max = arr.reduce((pre,cur) =>  parseFloat(pre) > parseFloat(cur) ? parseFloat(pre) : parseFloat(cur))
+
+let sum = 0;
+for(let j = 0; j < arr.length ; j++){
+  sum += parseFloat(arr[j]) ;
+}
+let mean = (sum / arr.length).toFixed(1);
+for(let j = 0; j < arr.length ; j++){
+  sum += Math.pow(parseFloat(arr[j]),2);
+}
+let RMS = Math.sqrt(sum / arr.length).toFixed(1);
+dif = (max - min).toFixed(1);
+min = parseFloat(min).toFixed(1);
+max = parseFloat(max).toFixed(1);
+
+data = {
+  p1:{x:(point.p1.x * 1 - 10).toFixed(1), y: ((580 - point.p1.y) / mult).toFixed(1)},
+  p2:{x:(point.p2.x * 1 - 10).toFixed(1), y: ((580 - point.p2.y) / mult).toFixed(1)},
+  cp1:{x:(point.cp1.x * 1 - 10).toFixed(1), y: ((580 - point.cp1.y) / mult).toFixed(1)},
+  cp2:{x:(point.cp2.x * 1 - 10).toFixed(1), y: ((580 - point.cp2.y) / mult).toFixed(1)},
+}
+curY = [data.cp1.x, data.cp1.y, data.cp2.x, data.cp2.y];
+
+if (code) {
+  code.innerHTML = 
+    " \xa0 初始温度(" + data.p1.x + " " + data.p1.y +")\n" +
+    " \xa0 结束温度(" +  data.p2.x+" "+data.p2.y+")\n" +
+    ` \xa0 最大值:${max} \n \xa0 最小值:${min}\n\xa0  差:${dif} \n` +
+    `  \xa0平均值:${mean} \n \xa0 均方根:${RMS}`
+    
+  ;
+}
+}
+
+
+// start dragging
+function DragStart(e) {
+e = MousePos(e);
+var dx, dy;
+for (var p in point) {
+  dx = point[p].x - e.x;
+  dy = point[p].y - e.y;
+  if ((dx * dx) + (dy * dy) < style.point.radius * style.point.radius) {
+
+    drag = p;
+    dPoint = e;
+    canvas1.style.cursor = "move";
+    return;
+  }
+}
+}
+
+
+// dragging
+function Dragging(e) {
+if (drag) {
+
+  e = MousePos(e);
+  point[drag].x += e.x - dPoint.x;
+  point[drag].y += e.y - dPoint.y;
+  dPoint = e;
+  DrawCanvas();
+}
+}
+
+
+// end dragging
+function DragEnd(e) {
+drag = null;
+canvas1.style.cursor = "default";
+DrawCanvas();
+}
+
+
+// event parser
+function MousePos(event) {
+event = (event ? event : window.event);
+return {
+  x: (event.pageX - $('#canvas1').offset().left) * 650 / canvas1.getBoundingClientRect().width,
+  y: (event.pageY - $('#canvas1').offset().top)  * 600 / canvas1.getBoundingClientRect().height
+}
+}
+
+function threeBezier2(t, p1, cp1, cp2, p2) {
+    const [x1, y1] = p1;
+    const [x2, y2] = p2;
+    const [cx1, cy1] = cp1;
+    const [cx2, cy2] = cp2;
+    let x =
+        x1 * (1 - t) * (1 - t) * (1 - t) +
+        3 * cx1 * t * (1 - t) * (1 - t) +
+        3 * cx2 * t * t * (1 - t) +
+        x2 * t * t * t;
+    let y =
+        y1 * (1 - t) * (1 - t) * (1 - t) +
+        3 * cy1 * t * (1 - t) * (1 - t) +
+        3 * cy2 * t * t * (1 - t) +
+        y2 * t * t * t;
+    return ((580 - y) / mult).toFixed(1)
+  }
+    })
+  </script>
+</head>
+<body>
+  <div class="sidel">
+    <label for="file" style="display: block;text-align: center;">
+      <span class="btn btn-outline-success btn-up btn-lg mt-5">上传文档</span>
+      <input type="file" class="form-control-file d-none" id="file">
+    </label>
+    <div class="list-group mt-4" id="listMenu">
+      <a href="javascript:void(0)" class="list-group-item list-group-item-action" ondragstart="return false">选择区间
+        <div class="aaaa">
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" checked>
+            <label class="form-check-label" for="inlineRadio1"><span class="input-group-text border-light">CH01~CH10</span></label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
+            <label class="form-check-label" for="inlineRadio2"><span class="input-group-text border-light">CH11~CH20</span></label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3">
+            <label class="form-check-label" for="inlineRadio3"><span class="input-group-text border-light">CH21~CH30</span></label>
+          </div>
+        </div>
+      </a>
+      <a href="javascript:void(0)" class="list-group-item list-group-item-action " ondragstart="return false">温升变化
+        <div>
+          <div class="input-group mt-2 w-auto mx-1">
+            <input type="text" aria-label="" class="form-control " placeholder="整体设定" id="p1" autocomplete="off" >
+          </div>
+          <div class="input-group mt-1 mx-1 w-auto">
+            <input type="text" aria-label="" class="form-control" placeholder="CH01" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH02" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH03" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH04" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH05" style="display: none;" autocomplete="off" >
+          </div>
+          <div class="input-group mt-1 mx-1 w-auto">
+            <input type="text" aria-label="" class="form-control" placeholder="CH06" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH07" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH08" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH09" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH10" style="display: none;" autocomplete="off" >
+          </div>
+          <button class="btn btn-outline-info btn-switch" id="btn1">曲线单独设置</button>
+        </div>
+      </a>
+      <a href="javascript:void(0)" class="list-group-item list-group-item-action " ondragstart="return false">初温设定
+        <div>
+          <div class="input-group mt-2 w-auto mx-1">
+            <input type="text" aria-label="" class="form-control " placeholder="整体设定" id="p11" autocomplete="off" >
+          </div>
+          <div class="input-group mt-1 mx-1 w-auto">
+            <input type="text" aria-label="" class="form-control" placeholder="CH01" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH02" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH03" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH04" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH05" style="display: none;" autocomplete="off" >
+          </div>
+          <div class="input-group mt-1 mx-1 w-auto">
+            <input type="text" aria-label="" class="form-control" placeholder="CH06" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH07" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH08" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH09" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH10" style="display: none;" autocomplete="off" >
+          </div>
+          <button class="btn btn-outline-info btn-switch" id="btn2">曲线单独设置</button>
+        </div>
+      </a>
+      <a href="javascript:void(0)" class="list-group-item list-group-item-action" ondragstart="return false">平稳时间
+        <div>
+          <div class="input-group mt-2 w-auto mx-1">
+            <input type="text" aria-label="" class="form-control " placeholder="整体设定" id="p2" autocomplete="off" >
+          </div>
+          <div class="input-group mt-1 mx-1 w-auto">
+            <input type="text" aria-label="" class="form-control" placeholder="CH01" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH02" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH03" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH04" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH05" style="display: none;" autocomplete="off" >
+          </div>
+          <div class="input-group mt-1 mx-1 w-auto">
+            <input type="text" aria-label="" class="form-control" placeholder="CH06" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH07" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH08" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH09" style="display: none;" autocomplete="off" >
+            <input type="text" aria-label="" class="form-control" placeholder="CH10" style="display: none;" autocomplete="off" >
+          </div>
+          <button class="btn btn-outline-info btn-switch" id="btn3">曲线单独设置</button>
+        </div>
+      </a>
+      <a href="javascript:void(0)" class="list-group-item list-group-item-action" ondragstart="return false">增加曲线
+        <div id="mmmm">
+          <div class="input-group m-1">
+            <div class="input-group-prepend">
+              <span class="input-group-text">初始温度</span>
+            </div>
+            <input type="text" aria-label="" class="form-control" placeholder="" id="p12" autocomplete="off">
+          </div>
+          <div class="input-group m-1">
+            <div class="input-group-prepend">
+              <span class="input-group-text">结束温度</span>
+            </div>
+            <input type="text" aria-label="" class="form-control" placeholder="" id="p121" autocomplete="off">
+          </div>
+
+          <button class="btn btn-outline-info btn-lg " id="create">增加</button>
+          <button class="btn btn-outline-info btn-lg " id="comfirm">确认</button>
+          <button class="btn btn-outline-info btn-lg " id="simulate" >模拟</button>
+          
+        </div>
+        
+      </a>
+      <a href="javascript:void(0)" class="list-group-item list-group-item-action" ondragstart="return false">时间设定
+        <div>
+          <div class="input-group m-2 w-auto">
+          <div class="input-group-prepend">
+            <span class="input-group-text">开始时间</span>
+          </div>
+          <input type="text" aria-label="" class="form-control" placeholder="格式:(2020/07/05 11:21:03)" id="p3" autocomplete="off">
+        </div>
+        <div class="input-group m-2 w-auto">
+          <div class="input-group-prepend">
+            <span class="input-group-text">持续时间</span>
+          </div>
+          <input type="text" aria-label="" class="form-control" placeholder="格式:(3154) 单位为秒" id="p4" autocomplete="off">
+        </div>
+        </div>
+      </a>
+      
+    </div>
+    <button class="btn btn-outline-success btn-lg m-5 w-50 mx-auto" id="op">修改</button>
+    <button class="btn btn-outline-success btn-lg m-3 w-50 mx-auto" id="pri">打印</button>
+    <pre id="code"></pre>
+    
+    <p class="endp2">© 2020 Powered by STAFF</p>
+    <p class="endp"> Creative Gols</p>
+    
+  </div>
+  <div class="project">
+    <div class="page">
+      <div class="head">
+        <table >
+          <tr>
+            <td>File Message</td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>File Name</td>
+            <td></td>
+            <td>Data Count</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Device Type</td>
+            <td>: MV2000</td>
+            <td>Sampling Interval</td>
+            <td>: 1.000 秒</td>
+          </tr>
+          <tr>
+            <td>Serial No.</td>
+            <td>: S5L911693</td>
+            <td>Start Time</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Time Correction</td>
+            <td>: None</td>
+            <td>Stop Time</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Starting Condition</td>
+            <td>: Manual</td>
+            <td>Trigger Time</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Dividing Condition</td>
+            <td>: Manual</td>
+            <td>Trigger No.</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Meas Ch.</td>
+            <td></td>
+            <td>Damage Check</td>
+            <td>: Not Damaged</td>
+          </tr>
+          <tr>
+            <td>Math Ch.</td>
+            <td>: 0</td>
+            <td>Started by</td>
+            <td>: [ Key In ]</td>
+          </tr>
+          <tr>
+            <td>Ext Ch.</td>
+            <td>: 0</td>
+            <td>Stopped by</td>
+            <td>: [ Key In ]</td>
+          </tr>
+          <tr>
+            <td>Printed Group</td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Printed Range</td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Comment</td>
+            <td>: </td>
+            <td></td>
+            <td></td>
+          </tr>
+        </table>
+      </div>
+      <div class="main">
+        <div class="top">
+          <table>
+            <tr>
+              <td></td>
+              <td>光标 A</td>
+              <td>光标 B</td>
+              <td>差</td>
+            </tr>
+            <tr>
+              <td>数据号码</td>
+              <td>0</td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>绝对时间</td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>选择通道</td>
+              <td>值 A</td>
+              <td>值 B</td>
+              <td>值B-值A</td>
+            </tr>
+            
+          </table>
+        </div>
+        <div class="middle">
+          <span>运算区间</span>
+          <input type="text" value="0">
+          <span>-</span>
+          <input type="text">
+        </div>
+        <div class="bottom">
+          <table>
+            <tr>
+              <td>选择通道</td>
+              <td>MIN</td>
+              <td>MAX</td>
+              <td>P-P</td>
+              <td>Mean</td>
+              <td>RMS</td>
+            </tr> 
+          </table>
+        </div>
+      </div>
+      
+      <div class="footer">
+        <div class="col">
+          <div class="img"></div>
+          <div class="txt">
+            <span>0</span>
+            <span>50</span>
+            <span>100</span>
+            <span>150</span>
+            <span>200</span>
+          </div>
+        </div>
+        <div class="col2">
+          <canvas id="canvas" width="650" height="600" ></canvas>
+          <canvas id="canvas1" width="650" height="600"></canvas>
+          <div class="timex">
+            <div class="timeset">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="timetxt">绝对时间 [h:m:s]</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+  </div>
+
+</body>
+</html>
